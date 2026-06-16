@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from app.database import engine, Base, get_db
 from app.routers import auth, cuentas, categorias
@@ -6,8 +7,6 @@ from app.auth import obtener_usuario_actual
 import secrets
 import string
 
-# Crea todas las tablas en la base de datos al arrancar
-# Si ya existen, no hace nada
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -15,7 +14,13 @@ app = FastAPI(
     description="API segura para gestionar tus credenciales",
     version="1.0.0"
 )
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:1420", "tauri://localhost"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # Conecta todos los routers
 app.include_router(auth.router)
 app.include_router(cuentas.router)
